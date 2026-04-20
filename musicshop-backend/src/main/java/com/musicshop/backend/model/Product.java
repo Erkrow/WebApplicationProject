@@ -2,6 +2,7 @@ package com.musicshop.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "products")
@@ -14,17 +15,19 @@ public class Product {
     private String name;
     private String brand;
     private String type;
-    private Double price;
+    private BigDecimal price;
     private String specs;
 
-    // React oczekuje pola "desc", ale w bazie musimy użyć innej nazwy,
-    // ponieważ "desc" to zarezerwowane słowo w języku SQL.
     @JsonProperty("desc")
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String image;
-    private String category;
+    private String imageUrl;
+    private Integer stockQuantity;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     // --- Poniżej znajdują się Gettery i Settery (wymagane przez Springa) ---
 
@@ -40,8 +43,8 @@ public class Product {
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
 
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
 
     public String getSpecs() { return specs; }
     public void setSpecs(String specs) { this.specs = specs; }
@@ -49,9 +52,22 @@ public class Product {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getImage() { return image; }
-    public void setImage(String image) { this.image = image; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public Integer getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(Integer stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 }
