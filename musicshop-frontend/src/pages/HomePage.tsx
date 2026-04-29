@@ -135,13 +135,13 @@ export default function HomePage() {
                 .home-deal-btn { background-color: #c2410c; color: white; border: none; border-radius: 6px; padding: 8px 14px; font-size: 13px; font-weight: 500; cursor: pointer; }
 
                 .main-content { padding-top: 0; } /* Reset padding from App.css */
-                .home-trust-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 2rem 0.5rem; }
+                .home-trust-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 2rem; }
                 .home-trust-item { background: white; border: 0.5px solid #e8ddd4; border-radius: 10px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 12px; }
                 .home-trust-icon { width: 36px; height: 36px; background: #fdf3ec; border-radius: 8px; display: grid; place-items: center; flex-shrink: 0; }
                 .home-trust-title { font-size: 13px; font-weight: 500; color: #1c1410; }
                 .home-trust-desc { font-size: 12px; color: #7a6050; }
 
-                .home-featured-products { padding-bottom: 2rem; }
+                .home-featured-products { padding: 2rem; }
                 .home-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
                 .home-section-header h2 { font-size: 16px; font-weight: 500; }
                 .home-section-header a { color: #c2410c; font-size: 13px; font-weight: 500; text-decoration: none; }
@@ -153,7 +153,7 @@ export default function HomePage() {
                 .home-sort-select { background-color: white; border: 0.5px solid #e2d4c8; color: #5c4033; font-size: 12px; padding: 5px 12px; border-radius: 6px; }
                 .home-products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
 
-                .home-custom-order-banner { background-color: #7c2d12; border-radius: 12px; padding: 1.75rem 2rem; display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
+                .home-custom-order-banner { background-color: #7c2d12; border-radius: 12px; padding: 1.75rem 2rem; display: flex; justify-content: space-between; align-items: center; margin: 2rem}
                 .home-custom-order-banner h2 { color: white; font-size: 18px; font-weight: 500; margin: 0 0 4px 0; }
                 .home-custom-order-banner p { color: #fca882; font-size: 13px; margin: 0; max-width: 320px; }
                 .home-custom-order-banner button { background-color: white; color: #7c2d12; border: none; padding: 10px 22px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }

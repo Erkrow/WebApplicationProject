@@ -24,7 +24,7 @@ export default function ProductsPage({ category }: ProductsPageProps) {
 
     const categoryProducts = useMemo(() => {
         if (category === 'all') return dbProducts;
-        return dbProducts.filter(p => p.category.toLowerCase() === category.toLowerCase());
+        return dbProducts.filter(p => p.category && p.category.toLowerCase() === category.toLowerCase());
     }, [dbProducts, category]);
 
     const displayedProducts = useMemo(() => {
