@@ -1,4 +1,3 @@
-// src/components/cart/CartModal.tsx
 import { useContext } from 'react';
 import { CartContext } from '../../context/CartContext';
 
@@ -6,113 +5,70 @@ export default function CartModal() {
     const cartContext = useContext(CartContext);
 
     if (!cartContext) return null;
-    const { cart, removeFromCart, getCartTotal, isCartOpen, toggleCart, clearCart } = cartContext;
+    const { cart, removeFromCart, getCartTotal, isCartOpen, toggleCart } = cartContext;
 
-    // Jeśli koszyk jest zamknięty, nie renderujemy niczego
     if (!isCartOpen) return null;
 
-    // Funkcja obsługująca zatwierdzenie formularza
-    const handleConfirmOrder = (e: React.FormEvent) => {
-        e.preventDefault(); // Zapobiega przeładowaniu strony
-        
-        if (cart.length === 0) {
-            alert("Twój koszyk jest pusty!");
-            return;
-        }
-
-        alert(`Dziękujemy za zamówienie na kwotę ${getCartTotal()} zł!`);
-        clearCart(); // Czyścimy koszyk
-        toggleCart(); // Zamykamy modal
-    };
-
     return (
-        <div className="modal show" onClick={toggleCart}>
-            {/* Zatrzymujemy propagację kliknięcia, aby kliknięcie w sam modal go nie zamknęło */}
-            <div className="modal-content cart-modal-content" onClick={e => e.stopPropagation()}>
-                <span className="close-cross" onClick={toggleCart}>&times;</span>
+        <>
+            <div className="cart-overlay" onClick={toggleCart}></div>
+            <div className="cart-panel">
+                <div className="cart-header">
+                    <span className="cart-title">your cart</span>
+                    <button className="cart-close-btn" onClick={toggleCart}>&times;</button>
+                </div>
+                
+                <div className="cart-items-list">
+                    {cart.length === 0 ? (
+                        <p className="cart-empty-message">Your cart is empty.</p>
+                    ) : (
+                        cart.map((item, index) => (
+                            <div className="cart-item" key={`${item.id}-${index}`}>
+                                <div className="cart-item-image">
+                                    <img src={item.image || `https://placehold.co/60?text=${item.name}`} alt={item.name} />
+                                </div>
+                                <div className="cart-item-info">
+                                    <div className="cart-item-name">{item.name}</div>
+                                </div>
+                                <div className="cart-item-price">{item.price.toLocaleString()} zł</div>
+                                <button className="cart-item-remove-btn" onClick={() => removeFromCart(index)}>&times;</button>
+                            </div>
+                        ))
+                    )}
+                </div>
 
-                <div className="cart-layout">
-                    {/* LEWA KOLUMNA: Lista produktów */}
-                    <div className="cart-left-column">
-                        <h2 className="cart-column-title">Twój Koszyk</h2>
-                        <div className="cart-items-scroll">
-                            {cart.length === 0 ? (
-                                <p className="empty-msg">Twój koszyk jest pusty.</p>
-                            ) : (
-                                cart.map((item, index) => (
-                                    <div className="cart-item-row" key={`${item.id}-${index}`}>
-                                        <img 
-                                            src={item.image || `https://placehold.co/50?text=Foto`} 
-                                            alt={item.name} 
-                                            className="cart-item-img" 
-                                        />
-                                        <div className="cart-item-info">
-                                            <div className="cart-item-name">{item.name}</div>
-                                            <div className="cart-item-price">{item.price} zł</div>
-                                        </div>
-                                        <button 
-                                            className="btn-remove-small" 
-                                            onClick={() => removeFromCart(index)}
-                                        >
-                                            Usuń
-                                        </button>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                        <div className="cart-total-section">
-                            Suma: <span className="total-price">{getCartTotal()} zł</span>
-                        </div>
+                <div className="cart-footer">
+                    <div className="cart-total-row">
+                        <span>total</span>
+                        <span>{getCartTotal().toLocaleString()} zł</span>
                     </div>
-
-                    {/* PRAWA KOLUMNA: Formularz zamówienia */}
-                    <div className="cart-right-column">
-                        <h2 className="cart-column-title">📦 Dane do wysyłki</h2>
-                        <form id="orderForm" className="checkout-form" onSubmit={handleConfirmOrder}>
-                            <div className="form-group">
-                                <input type="text" placeholder="Imię i nazwisko *" required />
-                            </div>
-                            <div className="form-group">
-                                <input type="email" placeholder="Email *" required />
-                            </div>
-                            <div className="form-group">
-                                <input type="text" placeholder="Adres (ulica, nr) *" required />
-                            </div>
-                            <div className="form-row-split">
-                                <input type="text" placeholder="Kod pocztowy *" required />
-                                <input type="text" placeholder="Miasto *" required />
-                            </div>
-
-                            <h2 className="cart-column-title mt-4">💳 Metoda płatności</h2>
-                            <div className="payment-options">
-                                <label className="payment-option">
-                                    <input type="radio" name="payment" value="blik" defaultChecked />
-                                    <span>BLIK</span>
-                                </label>
-                                <label className="payment-option">
-                                    <input type="radio" name="payment" value="card" />
-                                    <span>Karta płatnicza</span>
-                                </label>
-                                <label className="payment-option">
-                                    <input type="radio" name="payment" value="transfer" />
-                                    <span>Przelew bankowy</span>
-                                </label>
-                                <label className="payment-option">
-                                    <input type="radio" name="payment" value="cod" />
-                                    <span>Przy odbiorze</span>
-                                </label>
-                            </div>
-
-                            <div className="checkout-actions">
-                                <button type="submit" className="btn-checkout-confirm">✅ Zamawiam</button>
-                                <button type="button" className="btn-checkout-back" onClick={toggleCart}>
-                                    Wróć do sklepu
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    <button className="cart-checkout-btn">go to checkout</button>
+                    <p className="cart-shipping-info">free shipping on orders over 500 zł</p>
                 </div>
             </div>
-        </div>
+            <style>{`
+                .cart-overlay { position: fixed; inset: 0; background: rgba(28,20,16,0.6); backdrop-filter: blur(2px); z-index: 1000; }
+                .cart-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 420px; background: white; display: flex; flex-direction: column; box-shadow: -4px 0 24px rgba(28,20,16,0.15); }
+                .cart-header { padding: 1.25rem 1.5rem; border-bottom: 0.5px solid #e8ddd4; display: flex; justify-content: space-between; align-items: center; }
+                .cart-title { font-family: var(--font-display); font-size: 20px; }
+                .cart-close-btn { background: transparent; border: none; color: #7a6050; font-size: 24px; cursor: pointer; }
+                .cart-items-list { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 12px; }
+                .cart-empty-message { text-align: center; color: #7a6050; margin-top: 2rem; }
+                .cart-item { display: flex; gap: 12px; align-items: center; }
+                .cart-item-image { width: 60px; height: 60px; background: #fdf3ec; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+                .cart-item-image img { max-width: 80%; max-height: 80%; }
+                .cart-item-info { flex: 1; }
+                .cart-item-name { font-size: 14px; font-weight: 500; }
+                .cart-item-brand { font-size: 12px; color: #7a6050; }
+                .cart-item-price { font-size: 15px; font-weight: 500; color: #c2410c; }
+                .cart-item-remove-btn { color: #a89080; background: transparent; border: none; font-size: 20px; cursor: pointer; padding: 5px; }
+                .cart-footer { padding: 1.25rem 1.5rem; border-top: 0.5px solid #e8ddd4; }
+                .cart-total-row { display: flex; justify-content: space-between; align-items: center; }
+                .cart-total-row span:first-child { color: #7a6050; font-size: 14px; }
+                .cart-total-row span:last-child { color: #1c1410; font-size: 18px; font-weight: 500; }
+                .cart-checkout-btn { width: 100%; background: #c2410c; color: white; border: none; padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 500; margin-top: 12px; cursor: pointer; }
+                .cart-shipping-info { font-size: 12px; color: #a89080; text-align: center; margin-top: 10px; }
+            `}</style>
+        </>
     );
 }

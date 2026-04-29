@@ -1,17 +1,66 @@
-// src/components/layout/CategoryNav.tsx
 import { NavLink } from 'react-router-dom';
+
+const categories = [
+    { name: 'all', path: '/' },
+    { name: 'guitars', path: '/products/guitars' },
+    { name: 'pianos', path: '/products/pianos' },
+    { name: 'keyboards', path: '/products/keyboards' },
+    { name: 'accessories', path: '/products/accessories' },
+];
 
 export default function CategoryNav() {
     return (
-        <div className="nav-categories">
-            <div className="nav-categories-content">
-                {/* NavLink automatycznie dodaje klasę 'active', gdy URL do niego pasuje */}
-                <NavLink to="/" className={({ isActive }: {isActive: boolean}) => isActive ? "nav-item active" : "nav-item"}>Wszystkie</NavLink>
-                <NavLink to="/gitary" className={({ isActive }: {isActive: boolean}) => isActive ? "nav-item active" : "nav-item"}>Gitary</NavLink>
-                <NavLink to="/fortepiany" className={({ isActive }: {isActive: boolean}) => isActive ? "nav-item active" : "nav-item"}>Fortepiany</NavLink>
-                <NavLink to="/keyboardy" className={({ isActive }: {isActive: boolean}) => isActive ? "nav-item active" : "nav-item"}>Keyboardy</NavLink>
-                <NavLink to="/wzmacniacze" className={({ isActive }: {isActive: boolean}) => isActive ? "nav-item active" : "nav-item"}>Wzmacniacze</NavLink>
-            </div>
-        </div>
+        <>
+            <nav className="catnav-container">
+                <div className="catnav-content">
+                    {categories.map((category) => (
+                        <NavLink
+                            key={category.name}
+                            to={category.path}
+                            className={({ isActive }) => 
+                                `catnav-btn ${isActive ? 'active' : ''}`
+                            }
+                            end={category.path === '/'}
+                        >
+                            {category.name}
+                        </NavLink>
+                    ))}
+                </div>
+            </nav>
+            <style>{`
+                .catnav-container {
+                    background-color: #241a10;
+                    border-bottom: 0.5px solid #3d2e1e;
+                }
+                .catnav-content {
+                    max-width: 1120px;
+                    margin: 0 auto;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 1.5rem;
+                }
+                .catnav-btn {
+                    color: #7a6050;
+                    padding: 13px 18px;
+                    font-size: 13px;
+                    border: none;
+                    background-color: transparent;
+                    cursor: pointer;
+                    text-decoration: none;
+                    text-transform: capitalize;
+                    transition: color 0.2s;
+                    border-bottom: 2px solid transparent;
+                    margin-bottom: -1px; /* Overlap the container border */
+                }
+                .catnav-btn:hover {
+                    color: #c4a882;
+                }
+                .catnav-btn.active {
+                    color: #f97316;
+                    border-bottom-color: #f97316;
+                    font-weight: 500;
+                }
+            `}</style>
+        </>
     );
 }

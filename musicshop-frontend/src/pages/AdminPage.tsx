@@ -2,71 +2,111 @@ import { useState } from 'react';
 import axios from 'axios';
 
 export default function AdminPage() {
-    // Stan przechowujący dane nowego produktu
     const [formData, setFormData] = useState({
         name: '', brand: '', type: '', price: '', 
-        specs: '', desc: '', image: '', category: 'gitary' // Domyślna kategoria
+        specs: '', desc: '', image: '', category: 'guitars'
     });
     const [message, setMessage] = useState('');
 
-    // Funkcja aktualizująca stan podczas wpisywania
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // Funkcja wysyłająca dane do Spring Boota
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Pobieramy nasz token z pamięci przeglądarki
         const token = localStorage.getItem('jwt_token');
-
         try {
             await axios.post('http://localhost:8080/api/products', formData, {
-                headers: {
-                    // To jest kluczowe! Pokazujemy backendowi naszą przepustkę.
-                    'Authorization': `Bearer ${token}` 
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-            
-            setMessage('✅ Produkt został pomyślnie dodany do bazy!');
-            // Czyszczenie formularza
-            setFormData({ name: '', brand: '', type: '', price: '', specs: '', desc: '', image: '', category: 'gitary' });
-            
+            setMessage('✅ Product added successfully!');
+            setFormData({ name: '', brand: '', type: '', price: '', specs: '', desc: '', image: '', category: 'guitars' });
         } catch (error) {
             console.error(error);
-            setMessage('❌ Wystąpił błąd podczas dodawania produktu.');
+            setMessage('❌ Error adding product.');
         }
     };
 
     return (
-        <div className="container" style={{ maxWidth: '600px', margin: '50px auto' }}>
-            <h2 style={{ textAlign: 'center' }}>👑 Panel Administratora</h2>
-            <p style={{ textAlign: 'center', marginBottom: '30px' }}>Dodaj nowy produkt do sklepu</p>
+        <>
+            <div className="admin-page-container">
+                <div className="admin-content">
+                    <h1>Admin Panel</h1>
+                    <p className="admin-subtitle">Add a new product to the store catalog.</p>
 
-            {message && <div style={{ padding: '10px', marginBottom: '20px', textAlign: 'center', fontWeight: 'bold' }}>{message}</div>}
+                    <form onSubmit={handleSubmit} className="admin-form-card">
+                        {message && <div className="admin-message">{message}</div>}
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <input type="text" name="name" placeholder="Nazwa produktu (np. Stratocaster)" value={formData.name} onChange={handleChange} required />
-                <input type="text" name="brand" placeholder="Marka (np. Fender)" value={formData.brand} onChange={handleChange} required />
-                <input type="text" name="type" placeholder="Typ (np. Elektryczna)" value={formData.type} onChange={handleChange} required />
-                <input type="number" name="price" placeholder="Cena (np. 3500)" value={formData.price} onChange={handleChange} required />
-                <input type="text" name="specs" placeholder="Specyfikacja (np. Układ SSS)" value={formData.specs} onChange={handleChange} required />
-                
-                <textarea name="desc" placeholder="Opis produktu..." value={formData.desc} onChange={handleChange} required rows={4} />
-                
-                <input type="text" name="image" placeholder="Ścieżka do zdjęcia (np. /images/gitara1.jpg lub URL)" value={formData.image} onChange={handleChange} required />
-                
-                <select name="category" value={formData.category} onChange={handleChange} required>
-                    <option value="gitary">Gitary</option>
-                    <option value="fortepiany">Pianina i Fortepiany</option>
-                    <option value="keyboardy">Keyboardy</option>
-                </select>
+                        <div className="admin-form-section">
+                            <div className="admin-section-header">Core Information</div>
+                            <div className="admin-grid-2-col">
+                                <div>
+                                    <label htmlFor="name">Product Name</label>
+                                    <input type="text" name="name" id="name" placeholder="e.g., Stratocaster" value={formData.name} onChange={handleChange} required />
+                                </div>
+                                <div>
+                                    <label htmlFor="brand">Brand</label>
+                                    <input type="text" name="brand" id="brand" placeholder="e.g., Fender" value={formData.brand} onChange={handleChange} required />
+                                </div>
+                            </div>
+                            <div className="admin-grid-3-col">
+                               <div>
+                                    <label htmlFor="price">Price (zł)</label>
+                                    <input type="number" name="price" id="price" placeholder="e.g., 3500" value={formData.price} onChange={handleChange} required />
+                                </div>
+                                <div>
+                                    <label htmlFor="category">Category</label>
+                                    <select name="category" id="category" value={formData.category} onChange={handleChange} required>
+                                        <option value="guitars">Guitars</option>
+                                        <option value="pianos">Pianos</option>
+                                        <option value="keyboards">Keyboards</option>
+                                        <option value="accessories">Accessories</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label htmlFor="type">Type</label>
+                                    <input type="text" name="type" id="type" placeholder="e.g., Electric Guitar" value={formData.type} onChange={handleChange} required />
+                                </div>
+                            </div>
+                        </div>
 
-                <button type="submit" style={{ padding: '12px', backgroundColor: '#d32f2f', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>
-                    Dodaj produkt do bazy
-                </button>
-            </form>
-        </div>
+                        <div className="admin-form-section">
+                            <div className="admin-section-header">Details & Media</div>
+                            <div>
+                                <label htmlFor="desc">Description</label>
+                                <textarea name="desc" id="desc" placeholder="Product description..." value={formData.desc} onChange={handleChange} required rows={4} />
+                            </div>
+                             <div>
+                                <label htmlFor="specs">Specifications</label>
+                                <input type="text" name="specs" id="specs" placeholder="e.g., SSS pickup configuration" value={formData.specs} onChange={handleChange} required />
+                            </div>
+                            <div>
+                                <label htmlFor="image">Image URL</label>
+                                <input type="text" name="image" id="image" placeholder="e.g., /images/strat.jpg" value={formData.image} onChange={handleChange} required />
+                            </div>
+                        </div>
+
+                        <button type="submit" className="admin-submit-btn">Add Product</button>
+                    </form>
+                </div>
+            </div>
+            <style>{`
+                .admin-page-container { background-color: #faf7f4; padding: 2rem; }
+                .admin-content { max-width: 700px; margin: 0 auto; }
+                .admin-content h1 { font-family: var(--font-display); font-size: 28px; font-weight: 500; color: #1c1410; margin-bottom: 0.5rem; }
+                .admin-subtitle { font-size: 14px; color: #7a6050; margin-bottom: 2rem; }
+                .admin-form-card { background: white; border: 0.5px solid #e8ddd4; border-radius: 14px; padding: 2rem; }
+                .admin-message { margin-bottom: 1rem; text-align: center; font-weight: 500; }
+                .admin-form-section { margin-bottom: 1.5rem; }
+                .admin-section-header { font-size: 13px; font-weight: 600; color: #7a6050; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 1rem; margin-top: 1.5rem; border-top: 1px solid #e8ddd4; padding-top: 1.5rem; }
+                .admin-form-section:first-of-type .admin-section-header { border-top: none; padding-top: 0; margin-top: 0; }
+                .admin-grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+                .admin-grid-3-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 14px; }
+                form label { font-size: 13px; font-weight: 500; color: #5c4033; margin-bottom: 5px; display: block; }
+                form input, form select, form textarea { width: 100%; background: #faf7f4; border: 0.5px solid #e2d4c8; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #1c1410; margin-bottom: 14px; }
+                form input:focus, form select:focus, form textarea:focus { outline: none; border-color: #c2410c; }
+                .admin-submit-btn { width: 100%; background: #c2410c; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 500; margin-top: 6px; cursor: pointer; }
+            `}</style>
+        </>
     );
 }
