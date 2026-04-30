@@ -25,13 +25,20 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
         // 2. Dekodujemy token, aby wyciągnąć rolę
         const decoded = jwtDecode<MyTokenPayload>(token);
 
-        // 3. Sprawdzamy, czy rola z tokena pasuje do tej wymaganej przez stronę
+        // 3. Sprawdzamy, czy token nie wygasł
+        const isExpired = decoded.exp * 1000 < Date.now();
+        if (isExpired) {
+            localStorage.removeItem("jwt_token");
+            return <Navigate to="/login" replace />;
+        }
+
+        // 4. Sprawdzamy, czy rola z tokena pasuje do tej wymaganej przez stronę
         if (decoded.role !== requiredRole) {
             alert(`Odmowa dostępu! Wymagana rola: ${requiredRole}. Twoja rola: ${decoded.role}`);
             return <Navigate to="/" replace />;
         }
 
-        // 4. Jeśli wszystko jest ok, wpuszczamy na stronę!
+        // 5. Jeśli wszystko jest ok, wpuszczamy na stronę!
         return <>{children}</>;
         
     } catch (error) {
