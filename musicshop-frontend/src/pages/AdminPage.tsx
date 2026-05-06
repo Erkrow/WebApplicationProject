@@ -3,8 +3,15 @@ import axios from 'axios';
 
 export default function AdminPage() {
     const [formData, setFormData] = useState({
-        name: '', brand: '', type: '', price: '', 
-        specs: '', desc: '', image: '', category: 'guitars'
+        name: '', 
+        brand: '', 
+        type: '', 
+        price: '', 
+        specs: '', 
+        desc: '', 
+        image: '', 
+        category: '',
+        stockQuantity: 10, // Domyślna wartość
     });
     const [message, setMessage] = useState('');
 
@@ -16,11 +23,26 @@ export default function AdminPage() {
         e.preventDefault();
         const token = localStorage.getItem('jwt_token');
         try {
-            await axios.post('http://localhost:8080/api/products', formData, {
+            const productData = {
+                ...formData,
+                description: formData.desc,
+                imageUrl: formData.image,
+            };
+            await axios.post('http://localhost:8080/api/products', productData, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             setMessage('✅ Product added successfully!');
-            setFormData({ name: '', brand: '', type: '', price: '', specs: '', desc: '', image: '', category: 'guitars' });
+            setFormData({ 
+                name: '', 
+                brand: '', 
+                type: '', 
+                price: '', 
+                specs: '', 
+                desc: '', 
+                image: '', 
+                category: '', 
+                stockQuantity: 10 
+            });
         } catch (error) {
             console.error(error);
             setMessage('❌ Error adding product.');
@@ -83,6 +105,10 @@ export default function AdminPage() {
                             <div>
                                 <label htmlFor="image">Image URL</label>
                                 <input type="text" name="image" id="image" placeholder="e.g., /images/strat.jpg" value={formData.image} onChange={handleChange} required />
+                            </div>
+                            <div>
+                                <label htmlFor="stockQuantity">Stock Quantity</label>
+                                <input type="number" name="stockQuantity" id="stockQuantity" placeholder="e.g., 10" value={formData.stockQuantity} onChange={handleChange} required />
                             </div>
                         </div>
 
