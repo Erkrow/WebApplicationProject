@@ -96,8 +96,9 @@ export default function HomePage() {
                         </select>
                     </div>
                     <div className="home-products-grid">
-                        {products.slice(0, 8).map(product => (
-                            <ProductCard key={product.id} product={product} />
+                        {Array.isArray(products) &&
+                           products.slice(0, 8).map(product => (
+                          <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 </section>

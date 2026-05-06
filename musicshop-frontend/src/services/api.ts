@@ -13,11 +13,17 @@ const apiClient = axios.create({
 // Function to fetch products from the database via Spring Boot
 export const fetchProductsFromDB = async (): Promise<Product[]> => {
     try {
-        const response = await apiClient.get<Product[]>('/products');
+        const response = await apiClient.get('/products');
+
+        if (!Array.isArray(response.data)) {
+            console.error("Expected array, got:", response.data);
+            return [];
+        }
+
         return response.data;
     } catch (error) {
         console.error("Error fetching products:", error);
-        return []; // Return empty array if the server is down
+        return [];
     }
 };
 
