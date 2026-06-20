@@ -8,6 +8,7 @@ import com.musicshop.backend.repository.ProductRepository;
 import com.musicshop.backend.repository.UserRepository;
 import com.musicshop.backend.repository.WishlistRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
@@ -34,6 +35,7 @@ public class WishlistService {
         });
     }
 
+    @Transactional
     public Wishlist addProduct(Long userId, Long productId) {
         Wishlist wishlist = getOrCreate(userId);
         Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
@@ -43,6 +45,7 @@ public class WishlistService {
         return wishlistRepository.save(wishlist);
     }
 
+    @Transactional
     public Wishlist removeProduct(Long userId, Long productId) {
         Wishlist wishlist = getOrCreate(userId);
         wishlist.getProducts().removeIf(product -> product.getId().equals(productId));

@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import './styles/tokens.css';
 import './index.css'
 import './App.css';
@@ -12,30 +13,34 @@ import ProductPageWrapper from './pages/ProductPageWrapper';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AdminPage from './pages/AdminPage';
+import DashboardPage from './pages/DashboardPage';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import CartModal from './components/cart/CartModal';
 
 function App() {
   return (
-    <CartProvider>
-      <Router>
-        <div className="app-wrapper">
-          <Header />
-          <CategoryNav />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-<Route path="/products/:category" element={<ProductPageWrapper />} />
-              <Route path='/register' element={<RegisterPage />} />
-              <Route path='/login' element={<LoginPage />} />
-              <Route path='/admin' element={<ProtectedRoute requiredRole='ROLE_ADMIN'><AdminPage /></ProtectedRoute>} />
-            </Routes>
-          </main>
-          <CartModal />
-          <Footer />
-        </div>
-      </Router>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <Router>
+          <div className="app-wrapper">
+            <Header />
+            <CategoryNav />
+            <main className="main-content">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/products/:category" element={<ProductPageWrapper />} />
+                <Route path='/register' element={<RegisterPage />} />
+                <Route path='/login' element={<LoginPage />} />
+                <Route path='/admin' element={<ProtectedRoute requiredRole='ROLE_ADMIN'><AdminPage /></ProtectedRoute>} />
+                <Route path='/admin/dashboard' element={<ProtectedRoute requiredRole='ROLE_ADMIN'><DashboardPage /></ProtectedRoute>} />
+              </Routes>
+            </main>
+            <CartModal />
+            <Footer />
+          </div>
+        </Router>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

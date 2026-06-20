@@ -1,24 +1,29 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 export default function RegisterPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
+    const { isLoggedIn } = useAuth();
+
+    // Redirect jesli juz zalogowany
+    if (isLoggedIn) return <Navigate to="/" replace />;
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             await axios.post('http://localhost:8080/api/auth/register', { username, password });
-            setMessage('Account created successfully! You can now log in.');
+            setMessage('Konto zostało utworzone! Możesz się teraz zalogować.');
             setIsError(false);
             setUsername('');
             setPassword('');
         } catch (error) {
             console.error("Registration error:", error);
-            setMessage('Error during registration. Try a different username.');
+            setMessage('Błąd podczas rejestracji. Spróbuj innej nazwy użytkownika.');
             setIsError(true);
         }
     };

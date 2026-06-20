@@ -1,49 +1,25 @@
 import { Navigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import { useAuth } from '../../context/AuthContext';
+import type { ReactNode } from 'react';
 
 interface ProtectedRouteProps {
-    children: React.ReactNode;
+    children: ReactNode;
     requiredRole: string;
 }
 
-// Interfejs opisujący, co zaszyfrowaliśmy w Spring Boot wewnątrz tokena
-interface MyTokenPayload {
-    sub: string; // to jest username
-    role: string; // to jest nasza rola, np. "ROLE_ADMIN"
-    exp: number; // data ważności
-}
-
 export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-    const token = localStorage.getItem('jwt_token');
+    const { isLoggedIn, user } = useAuth();
 
-    // 1. Jeśli nie ma tokena w ogóle -> wyrzuć na stronę logowania
-    if (!token) {
+    // Niezalogowany — przekieruj do logowania
+    if (!isLoggedIn) {
         return <Navigate to="/login" replace />;
     }
 
-    try {
-        // 2. Dekodujemy token, aby wyciągnąć rolę
-        const decoded = jwtDecode<MyTokenPayload>(token);
-
-        // 3. Sprawdzamy, czy token nie wygasł
-        const isExpired = decoded.exp * 1000 < Date.now();
-        if (isExpired) {
-            localStorage.removeItem("jwt_token");
-            return <Navigate to="/login" replace />;
-        }
-
-        // 4. Sprawdzamy, czy rola z tokena pasuje do tej wymaganej przez stronę
-        if (decoded.role !== requiredRole) {
-            alert(`Odmowa dostępu! Wymagana rola: ${requiredRole}. Twoja rola: ${decoded.role}`);
-            return <Navigate to="/" replace />;
-        }
-
-        // 5. Jeśli wszystko jest ok, wpuszczamy na stronę!
-        return <>{children}</>;
-        
-    } catch (error) {
-        // Jeśli token był zepsuty, usuwamy go i każemy się zalogować ponownie
-        localStorage.removeItem('jwt_token');
-        return <Navigate to="/login" replace />;
+    // Zalogowany ale nie ma wymaganej roli — przekieruj na glowna
+    if (user?.role !== requiredRole) {
+        return <Navigate to="/" replace />;
     }
-}
+
+    // Wszystko OK
+    return <>{children}</>;
+}

@@ -1,6 +1,7 @@
 package com.musicshop.backend.config;
 
 import com.musicshop.backend.security.JwtFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     @Autowired
-    private JwtFilter jwtFilter; // Wstrzykujemy naszego nowego Ochroniarza
+    private JwtFilter jwtFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -31,20 +32,34 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        // Logowanie i Rejestracja są publiczne
+                        // Publiczne — auth endpointy
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // POBIERANIE produktów jest publiczne (żeby strona główna działała)
+                        // Publiczne — GET produktow i kategorii
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
 
-                        // DODAWANIE produktów tylko dla roli ADMIN!
-                        // Uwaga: Spring domyślnie ucina przedrostek "ROLE_", więc wpisujemy samo "ADMIN"
+                        // Tylko ADMIN — modyfikacja produktow
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
 
-                        // Reszta zablokowana
+                        // Reszta wymaga zalogowania
                         .anyRequest().authenticated()
                 )
-                // Ustawiamy naszego ochroniarza tuż przed standardowym sprawdzaniem hasła
+                // JSON odpowiedz dla 401 — zapobiega SyntaxError w axios (domyslnie Spring zwraca HTML)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("{\"error\": \"Unauthorized — zaloguj sie aby kontynuowac\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.getWriter().write("{\"error\": \"Forbidden — brak uprawnien do tej operacji\"}");
+                        })
+                )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -9,6 +9,7 @@ export interface Product {
     desc: string;
     image: string;
     category: string;
+    stockQuantity?: number;
 }
 
 export interface CartItem {
@@ -16,4 +17,5 @@ export interface CartItem {
     name: string;
     price: number;
     image: string;
-}
+    quantity?: number;
+}

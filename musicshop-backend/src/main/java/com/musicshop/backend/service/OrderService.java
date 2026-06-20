@@ -9,6 +9,7 @@ import com.musicshop.backend.model.User;
 import com.musicshop.backend.repository.OrderRepository;
 import com.musicshop.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,6 +28,7 @@ public class OrderService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public Order createFromCart(Long userId, OrderRequest request) {
         Cart cart = cartService.getOrCreateCart(userId);
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
@@ -67,6 +69,7 @@ public class OrderService {
         return orderRepository.findByUserId(userId);
     }
 
+    @Transactional
     public Order updateStatus(Long id, String status) {
         Order order = getById(id);
         order.setStatus(status);

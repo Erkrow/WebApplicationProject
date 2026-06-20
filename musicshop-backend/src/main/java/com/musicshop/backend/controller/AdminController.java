@@ -1,8 +1,9 @@
 package com.musicshop.backend.controller;
 
+import com.musicshop.backend.dto.AdminStatsDTO;
 import com.musicshop.backend.dto.QuoteDiscountRequest;
+import com.musicshop.backend.dto.UserResponseDTO;
 import com.musicshop.backend.model.Order;
-import com.musicshop.backend.model.User;
 import com.musicshop.backend.service.AdminService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
-@PreAuthorize("hasRole(\'ROLE_ADMIN\')")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final AdminService adminService;
@@ -32,7 +33,7 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         return ResponseEntity.ok(adminService.getAllUsers());
     }
 
@@ -40,5 +41,11 @@ public class AdminController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         adminService.deleteUser(id);
         return ResponseEntity.ok().build();
+    }
+
+    // Dashboard — statystyki agregowane dla panelu admina
+    @GetMapping("/stats")
+    public ResponseEntity<AdminStatsDTO> getStats() {
+        return ResponseEntity.ok(adminService.getStats());
     }
 }

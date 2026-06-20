@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
     const [username, setUsername] = useState('');
@@ -8,19 +9,22 @@ export default function LoginPage() {
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
     const navigate = useNavigate();
+    const { login, isLoggedIn } = useAuth();
+
+    // Redirect jesli juz zalogowany
+    if (isLoggedIn) return <Navigate to="/" replace />;
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:8080/api/auth/login', { username, password });
-            localStorage.setItem('jwt_token', response.data.token);
-            localStorage.setItem('username', username);
-            setMessage('Logged in successfully!');
+            login(response.data.token); // Uzywa AuthContext — reaktywnie aktualizuje caly app
+            setMessage('Zalogowano pomyślnie!');
             setIsError(false);
-            setTimeout(() => navigate('/'), 1000);
+            navigate('/');
         } catch (error) {
             console.error("Login error:", error);
-            setMessage('Invalid username or password!');
+            setMessage('Nieprawidłowa nazwa użytkownika lub hasło.');
             setIsError(true);
         }
     };
@@ -30,11 +34,14 @@ export default function LoginPage() {
             <div className="auth-page-container">
                 <div className="auth-card">
                     <div className="auth-logo">
-                        <div className="auth-logo-icon"></div>
-                        <span>MusicShop</span>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                            <path d="M19.5 3.5L18 5M18 5L15.5 7.5M18 5L20.5 7.5M18 5L16.5 3.5M9 10.5C9 12.433 7.433 14 5.5 14C3.567 14 2 12.433 2 10.5C2 8.567 3.567 7 5.5 7C7.433 7 9 8.567 9 10.5Z" stroke="#f97316" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M9 10.5L20.5 21L22 19.5L10.5 8" stroke="#f97316" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span>GuitarShop</span>
                     </div>
-                    <h1>Welcome back</h1>
-                    <p className="auth-subtitle">Log in to your account.</p>
+                    <h1>Witaj z powrotem</h1>
+                    <p className="auth-subtitle">Zaloguj się do swojego konta.</p>
                     
                     {message && (
                         <div className={`auth-message ${isError ? 'error' : 'success'}`}>
@@ -43,28 +50,28 @@ export default function LoginPage() {
                     )}
 
                     <form onSubmit={handleLogin}>
-                        <label htmlFor="username">Username</label>
+                        <label htmlFor="login-username">Nazwa użytkownika</label>
                         <input 
                             type="text" 
-                            id="username"
+                            id="login-username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required 
                         />
                         
-                        <label htmlFor="password">Password</label>
+                        <label htmlFor="login-password">Hasło</label>
                         <input 
                             type="password" 
-                            id="password"
+                            id="login-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required 
                         />
                         
-                        <button type="submit" className="auth-submit-btn">Log In</button>
+                        <button type="submit" id="login-submit-btn" className="auth-submit-btn">Zaloguj się</button>
                     </form>
                     <p className="auth-bottom-link">
-                        Don't have an account? <Link to="/register">Sign up</Link>
+                        Nie masz konta? <Link to="/register">Zarejestruj się</Link>
                     </p>
                 </div>
             </div>

@@ -1,46 +1,62 @@
 package com.musicshop.backend.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
-    // Generujemy bezpieczny, losowy klucz na potrzeby podpisywania tokenów
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final long EXPIRATION_TIME = 86400000; // Ważność: 24 godziny w milisekundach
+    private final Key key;
+    private final long expirationMs;
+
+    // Wczytuje staly klucz z application.properties — nie regeneruje sie przy restarcie
+    public JwtUtil(
+            @Value("${app.jwt.secret}") String secret,
+            @Value("${app.jwt.expiration}") long expirationMs) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.expirationMs = expirationMs;
+    }
 
     public String generateToken(String username, String role) {
         return Jwts.builder()
-                .setSubject(username)           // Kto jest właścicielem tokenu
-                .claim("role", role)            // Zapisujemy rolę (np. ROLE_ADMIN) w środku tokenu
-                .setIssuedAt(new Date())        // Kiedy wydano
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Do kiedy ważny
-                .signWith(key)                  // Cyfrowy podpis
+                .setSubject(username)
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public String extractUsername(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        return parseClaims(token).getSubject();
     }
 
-    // NOWA METODA 2: Sprawdzanie, czy token jest prawidłowy i nie wygasł
+    public String extractRole(String token) {
+        return parseClaims(token).get("role", String.class);
+    }
+
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            parseClaims(token);
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

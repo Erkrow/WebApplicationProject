@@ -9,6 +9,7 @@ import com.musicshop.backend.repository.CartRepository;
 import com.musicshop.backend.repository.ProductRepository;
 import com.musicshop.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
@@ -35,6 +36,7 @@ public class CartService {
         });
     }
 
+    @Transactional
     public Cart addProduct(Long userId, Long productId, Integer quantity) {
         Cart cart = getOrCreateCart(userId);
         Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
@@ -56,12 +58,14 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
+    @Transactional
     public Cart removeProduct(Long userId, Long productId) {
         Cart cart = getOrCreateCart(userId);
         cart.getCartItems().removeIf(item -> item.getProduct().getId().equals(productId));
         return cartRepository.save(cart);
     }
 
+    @Transactional
     public void clearCart(Long userId) {
         Cart cart = getOrCreateCart(userId);
         cart.getCartItems().clear();

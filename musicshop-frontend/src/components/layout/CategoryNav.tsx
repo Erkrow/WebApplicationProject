@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
 
 const categories = [
-    { name: 'all', path: '/' },
-    { name: 'guitars', path: '/products/guitars' },
-    { name: 'pianos', path: '/products/pianos' },
-    { name: 'keyboards', path: '/products/keyboards' },
-    { name: 'accessories', path: '/products/accessories' },
+    { name: 'wszystkie', path: '/products/all' },
+    { name: 'elektryczne', path: '/products/elektryczne' },
+    { name: 'akustyczne', path: '/products/akustyczne' },
+    { name: 'klasyczne', path: '/products/klasyczne' },
+    { name: 'basowe', path: '/products/basowe' },
+    { name: 'akcesoria', path: '/products/akcesoria' },
 ];
 
 export default function CategoryNav() {
